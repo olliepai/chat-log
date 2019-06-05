@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>C H A T &nbsp; L O G</title>
+  <link type="text/css" rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <h2>C H A T &nbsp; L O G</h2>
+  <div id="control-panel">
+    <div id="messages-to">
+      <h3>MESSAGES TO</h3>
+      <form action="javascript:processForm('messages-to')" method="GET" id="check-form">
+        To: <input type="text" name="username" id="messages-to-username">
+        <br>
+        <br>
+        <input type="submit">
+      </form>
+    </div>
+    <div id="messages-from">
+      <h3>MESSAGES FROM</h3>
+      <form action="javascript:processForm('messages-from')" method="GET" id="check-form">
+        From: <input type="text" name="username" id="messages-from-username">
+        <br>
+        <br>
+        <input type="submit">
+      </form>
+    </div>
+    <div id="new-message">
+      <h3>NEW MESSAGE</h3>
+      <form action="javascript:processForm('new-message')" method="get" id="message-form">
+        From: <input type="text" name="from" id="from">
+        <br>
+        To: <input type="text" name="to" id="to">
+        <br>
+        <span style="font-size:10px"><i>NOTE: To send to multiple users, separate the usnames with <b>','</b></i> without spaces</span>
+        <br>
+        <br>
+        Subject: <input type="text" name="subject" id="subject">
+        <br>
+        <br>
+        <textarea name="message" id="message" placeholder="Enter message text here . . ."></textarea>
+        <br>
+        <br>
+        <input type="submit">
+      </form>
+    </div>
+    <div id="new-user">
+      <h3>NEW USER</h3>
+      <form action="javascript:processForm('new-user')" method="get" id="user-form">
+        username: <input type="text" name="username" id="new-user-username">
+        <br>
+        password: <input type="text" name="password" id="password">
+        <br>
+        email address: <input type="text" name="email" id="email">
+        <br>
+        first name: <input type="text" name="first-name" id="first-name">
+        <br>
+        last name: <input type="text" name="last-name" id="last-name">
+        <br>
+        <br>
+        <input type="submit">
+      </form>
+    </div>
+    <br>
+    <button type="button" onclick="clearResponseArea()">CLEAR RESPONSE AREA</button>
+  </div>
+  <div id="response-area">do something</div>
+</body>
+
+<script>
+  function processForm(form) {
+    if (form == 'messages-to') {
+      var username = document.getElementById("messages-to-username").value;
+      
+      if (username == "") {
+        showResults("Could not process request. The following fields are empty: <b>'To'</b><br><br>");
+      } else {
+        var url = "messages-to.php";
+        url += "?username=" + username;
+        httpGetAsync(url, showResults)
+      }
+    }
+    
+    else if (form == 'messages-from') {
+      var username = document.getElementById("messages-from-username").value;
+
+      if (username == "") {
+        showResults("Could not process request. The following fields are empty: <b>'From'</b><br><br>");
+      } else {
+        var url = "messages-from.php";
+        url += "?username=" + username;
+        httpGetAsync(url, showResults)
+      }
+    }
+
+    else if (form == 'new-message') {
+      var from = document.getElementById("from").value;
+      var to = document.getElementById("to").value;
+      var subject = document.getElementById("subject").value;
+      var message = document.getElementById("message").value;
+
+      var nullString = "Could not process request. The following fields are empty: ";
+      if (from == "") {
+        nullString += "<b>'From'</b> "
+      }
+      if (to == "") {
+        nullString += "<b>'To'</b> "
+      }
+      if (subject == "") {
+        nullString += "<b>'Subject'</b> "
+      }
+      if (message == "") {
+        nullString += "<b>'Message body'</b> "
+      }
+
+      if (nullString != "Could not process request. The following fields are empty: ") {
+        showResults(nullString + "<br><br>");
+      } else {
+        var url = "new-message.php";
+        url += "?from=" + from + "&to=" + to + "&subject=" + subject + "&message=" + message;
+        httpGetAsync(url, showResults)
+      }
+    }
+
+    else if (form == 'new-user') {
+      var username = document.getElementById("new-user-username").value;
+      var password = document.getElementById("password").value;
+      var email = document.getElementById("email").value;
+      var firstName = document.getElementById("first-name").value;
+      var lastName = document.getElementById("last-name").value;
+
+      var nullString = "Could not process request. The following fields are empty: ";
+      if (username == "") {
+        nullString += "<b>'username'</b> "
+      }
+      if (password == "") {
+        nullString += "<b>'password'</b> "
+      }
+      if (email == "") {
+        nullString += "<b>'email address'</b> "
+      }
+      if (firstName == "") {
+        nullString += "<b>'first name'</b> "
+      }
+      if (lastName == "") {
+        nullString += "<b>'last name'</b> "
+      }
+
+      if (nullString != "Could not process request. The following fields are empty: ") {
+        showResults(nullString + "<br><br>");
+      } else {
+        var url = "new-user.php";
+        url += "?username=" + username + "&password=" + password + "&email=" + email + "&first-name=" + firstName + "&last-name=" + lastName;
+        httpGetAsync(url, showResults)
+      }
+    }
+  }
+
+  function httpGetAsync(theUrl, callbackFunction) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+            callbackFunction(xmlHttp.responseText);
+    }
+    xmlHttp.open("GET", theUrl, true);
+    xmlHttp.send(null);
+  }
+
+  function showResults(responseText) {
+    if (document.getElementById("response-area").innerHTML != "do something") {
+      currentText = document.getElementById("response-area").innerHTML;
+      document.getElementById("response-area").innerHTML = currentText + responseText;
+    } else {
+      document.getElementById("response-area").innerHTML = responseText;
+    }
+  }
+
+  function clearResponseArea() {
+    document.getElementById("response-area").innerHTML = "do something";
+  }
+</script>
+
+</html>
